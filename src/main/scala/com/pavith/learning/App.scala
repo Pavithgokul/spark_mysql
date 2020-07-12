@@ -10,17 +10,22 @@ object App extends {
 
   def main(args: Array[String]): Unit ={
 
+
+    val sparkConf = commons.sparkconf
+    val mysqlConf = commons.mysqlConfig
+
+    println(mysqlConf.mysql_host)
+    println(mysqlConf.mysql_port)
+
     val spark = SparkSession.builder()
-      .appName("Deltalake Learning")
-      .master("local")
+      .appName(s"${sparkConf.spark_application_name}")
+      .master(s"${sparkConf.spark_master}")
       .getOrCreate()
 
     System.setProperty("hadoop.home.dir", "C:\\hadoop_utility\\")
 
     val inputDF = spark.read
-      .option("header", true)
-      .option("inferschema", true)
-      .csv("D:\\spark_deltalake_learning\\sample.csv")
+        .jdbc("jdbc:mysql://localhost:3306/learning_db", "employee", mysqlConf.prop)
 
     inputDF.show()
 
